@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post("/register", () => {}, () => {} );
 router.post("/login", () => {}, () => {} );
-router.get("/register", requireAuth, () => {} );
+router.post("/password/verify", requireAuth, () => {} );
+router.get("/me", requireAuth, () => {} );
 
 export default router;
