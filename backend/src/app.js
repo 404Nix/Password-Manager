@@ -1,0 +1,26 @@
+import express, { urlencoded } from 'express';
+import cors from "cors";
+import conf from "./conf/index.js";
+import morgan from 'morgan';
+import userRoute from "./routes/user.route.js"
+
+const app = express();
+
+app.use(urlencoded({extended: true}));
+app.use(express.json({limit: "1mb"}));
+app.use(cors({
+  origin: conf.CORS_ORIGIN,
+  credentials: true,
+}))
+app.use(express.static('public'));
+app.use(morgan("dev"));
+
+//routes
+app.use("/api/user", userRoute);
+
+
+app.get('/', (_req, res) => {
+  res.json({ message: 'Hello from the backend!' });
+});
+
+export default app;
