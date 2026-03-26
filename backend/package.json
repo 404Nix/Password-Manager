@@ -1,0 +1,15 @@
+{
+  "name": "password-manager",
+  "version": "1.0.0",
+  "description": "a password manager web app where user can securely save their passwords.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "password",
+    "manager"
+  ],
+  "author": "Nikhil",
+  "license": "ISC"
+}
