@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import conf from "../conf/index.js";
+import conf from "../conf/config.js";
 
 const requireAuth = (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];

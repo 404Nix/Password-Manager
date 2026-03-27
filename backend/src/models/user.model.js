@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
         },
         icon: {
             type: String,
+            default: null,
         },
         email: {
             type: String,

@@ -1,0 +1,22 @@
+const requiredKeys = {
+    MONGODB_URI: process.env.MONGODB_URI,
+    CORS_ORIGIN: process.env.CORS_ORIGIN,
+    ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
+    jwtSecret: process.env.jwtSecret,
+    expiresIn: process.env.expiresIn,
+};
+
+for (const [key, value] of Object.entries(requiredKeys)) {
+    if (!value) throw new Error(`Missing environment variable: ${key}`);
+}
+
+const conf = {
+    MONGODB_URI: String(process.env.MONGODB_URI),
+    PORT: Number(process.env.PORT) || 3000,
+    CORS_ORIGIN: String(process.env.CORS_ORIGIN.split(",")),
+    ENCRYPTION_KEY: String(process.env.ENCRYPTION_KEY),
+    jwtSecret: String(process.env.jwtSecret),
+    expiresIn: String(process.env.expiresIn),
+};
+
+export default conf;
