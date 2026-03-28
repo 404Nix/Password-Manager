@@ -1,16 +1,24 @@
 import express from "express";
 import requireAuth from "../middlewares/auth.middleware.js";
-import { getMe, refreshToken, registerUser } from "../controllers/user.controller.js";
+import {
+    getMe,
+    loginUser,
+    logOut,
+    logOutAll,
+    refreshToken,
+    registerUser,
+} from "../controllers/user.controller.js";
 
 const router = express.Router();
 
-router.post("/register", registerUser );
-router.post("/login", () => {}, () => {} );
+router.get("/get-me", requireAuth, getMe);
 
-router.post("/password/verify", requireAuth, () => {} );
+router.post("/register", registerUser);
+router.post("/login", loginUser);
 
-router.get("/get-me", requireAuth, getMe );
+router.get("/refresh-token", refreshToken);
 
-router.get("/refresh-token", refreshToken );
+router.get("/logout", logOut);
+router.get("/logout-all", logOutAll);
 
 export default router;

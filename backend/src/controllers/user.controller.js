@@ -1,7 +1,11 @@
 import conf from "../conf/config.js";
+import { Session } from "../models/session.model.js";
 import { User } from "../models/user.model.js";
-import generateToken from "../utils/token.js";
+import generateAccessToken from "../utils/accessToken.js";
+import generateRefreshToken from "../utils/refreshToken.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import bcrypt from "bcrypt";
 
 export const registerUser = async (req, res) => {
     const { name, icon, email, password } = req.body;
@@ -19,9 +23,21 @@ export const registerUser = async (req, res) => {
         password,
     });
 
-    const accessToken = generateToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
 
-    const refreshToken = generateToken(user._id, "7d");
+    const refreshTokenHash = crypto
+        .createHash("sha256")
+        .update(refreshToken)
+        .digest("hex");
+
+    const session = await Session.create({
+        userId: user._id,
+        refreshTokenHash,
+        ip: req.ip,
+        userAgent: req.headers["user-agent"],
+    });
+
+    const accessToken = generateAccessToken(user._id, session._id);
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -32,6 +48,57 @@ export const registerUser = async (req, res) => {
 
     res.status(201).json({
         message: "User registered successfully",
+        user: {
+            name: user.name,
+            email: user.email,
+            icon: user.icon,
+        },
+        accessToken,
+    });
+};
+
+export const loginUser = async (req, res) => {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({
+        email,
+    });
+
+    if (!user) {
+        return res.status(409).json({ message: "User Not Found" });
+    }
+
+    const decoded = bcrypt.compare(password, user.password);
+
+    if (!decoded) {
+        return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const refreshToken = generateRefreshToken(user._id);
+
+    const refreshTokenHash = crypto
+        .createHash("sha256")
+        .update(refreshToken)
+        .digest("hex");
+
+    const session = await Session.create({
+        userId: user._id,
+        refreshTokenHash,
+        ip: req.ip,
+        userAgent: req.headers["user-agent"],
+    });
+
+    const accessToken = generateAccessToken(user._id, session._id);
+
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.status(200).json({
+        message: "User logged In successfully",
         user: {
             name: user.name,
             email: user.email,
@@ -65,11 +132,33 @@ export const refreshToken = async (req, res) => {
 
     const decoded = jwt.verify(refreshToken, conf.jwtSecret);
 
-    const accessToken = generateToken(decoded.id);
+    const refreshTokenHash = crypto
+        .createHash("sha256")
+        .update(refreshToken)
+        .digest("hex");
 
-    const newrefreshToken = generateToken(decoded.id, "7d");
+    const session = await Session.findOne({
+        refreshTokenHash,
+        revoked: false,
+    });
 
-    res.cookie("refreshToken", newrefreshToken, {
+    if (!session) {
+        return res.status(401).json({ message: "Session invalid or expired" });
+    }
+
+    const newRefreshToken = generateRefreshToken(decoded.id);
+
+    const accessToken = generateAccessToken(decoded.id, session._id);
+
+    const newRefreshTokenHash = crypto
+        .createHash("sha256")
+        .update(newRefreshToken)
+        .digest("hex");
+
+    session.refreshTokenHash = newRefreshTokenHash;
+    await session.save();
+
+    res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: "strict",
@@ -79,5 +168,70 @@ export const refreshToken = async (req, res) => {
     res.status(200).json({
         message: "Access token refreshed successfully",
         accessToken,
+    });
+};
+
+export const logOut = async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const refreshTokenHash = crypto
+        .createHash("sha256")
+        .update(refreshToken)
+        .digest("hex");
+
+    const session = await Session.findOne({
+        refreshTokenHash,
+        revoked: false,
+    });
+
+    if (!session) {
+        return res.status(401).json({ message: "Session invalid or expired" });
+    }
+
+    session.revoked = true;
+    await session.save();
+
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+    });
+
+    res.status(200).json({
+        message: "Logged Out successfully!",
+    });
+};
+
+export const logOutAll = async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const decoded = jwt.verify(refreshToken, conf.jwtSecret);
+
+    await Session.updateMany(
+        {
+            userId: decoded.id,
+            revoked: false,
+        },
+        {
+            revoked: true,
+        },
+    );
+
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+    });
+
+    res.status(200).json({
+        message: "Logged Out from All Devices Successfully!",
     });
 };

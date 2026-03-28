@@ -1,11 +1,10 @@
 import conf from "../conf/config.js";
 import jwt from "jsonwebtoken";
 
-const generateToken = (userId, expiresIn=conf.expiresIn) => {
-
+const generateRefreshToken = (userId) => {
     return jwt.sign({ id: userId }, conf.jwtSecret, {
-        expiresIn,
+        expiresIn: conf.refreshTokenExpiresIn,
     });
 };
 
-export default generateToken;
+export default generateRefreshToken;

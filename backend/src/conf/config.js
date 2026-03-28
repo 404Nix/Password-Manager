@@ -4,6 +4,7 @@ const requiredKeys = {
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
     jwtSecret: process.env.jwtSecret,
     expiresIn: process.env.expiresIn,
+    refreshTokenExpiresIn: process.env.refreshTokenExpiresIn,
 };
 
 for (const [key, value] of Object.entries(requiredKeys)) {
@@ -17,6 +18,7 @@ const conf = {
     ENCRYPTION_KEY: String(process.env.ENCRYPTION_KEY),
     jwtSecret: String(process.env.jwtSecret),
     expiresIn: String(process.env.expiresIn),
+    refreshTokenExpiresIn: String(process.env.refreshTokenExpiresIn),
 };
 
 export default conf;
