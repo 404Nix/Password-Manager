@@ -39,8 +39,6 @@ const authLimiter = rateLimit({
 app.use("/api/", limiter);
 app.use("/api/auth", authLimiter);
 
-// Security Middlewares
-
 //routes
 app.use("/api/auth", userRoute);
 app.use("/api/password-manager", passwordManagerRoute);
