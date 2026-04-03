@@ -46,7 +46,9 @@ const LandingPage = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-bgPrimary via-transparent to-bgPrimary" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center pt-10 pb-12 gap-12">
+      {/* ── Section 1: Hero ─────────────────────────────────── */}
+      <section className="min-h-screen flex items-center relative z-10 pt-20 lg:pt-0">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-12">
         <motion.div
           className="flex-1 space-y-6 text-center lg:text-left"
           variants={stagger}
@@ -83,11 +85,15 @@ const LandingPage = () => {
             variants={fadeUp}
             className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-2"
           >
-            <Link to="/signup" className="group relative px-8 py-3.5 rounded-full bg-accentSecondary text-bgPrimary font-black uppercase tracking-widest hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all transform hover:-translate-y-1 w-full sm:w-auto overflow-hidden">
-              <span className="relative z-10 flex items-center gap-2 text-sm">
+            <Link to="/signup" className="group relative px-8 py-3.5 rounded-full bg-bgPrimary text-white font-black uppercase tracking-widest hover:shadow-[0_0_40px_rgba(6,182,212,0.3)] transition-all transform hover:-translate-y-1 w-full sm:w-auto overflow-hidden border border-white/5 active:scale-95">
+              {/* Rotating Border Layer */}
+              <div className="absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#06b6d4_0%,#7c3aed_50%,#06b6d4_100%)] opacity-30 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <div className="absolute inset-[1px] rounded-full bg-bgPrimary z-0 transition-colors group-hover:bg-bgPrimary/90" />
+
+              <span className="relative z-10 flex items-center gap-2 text-sm text-accentSecondary group-hover:text-white transition-colors duration-300">
                 Get Started <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
-              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
             </Link>
             <Link to="/login" className="px-8 py-3.5 rounded-full border border-border bg-bgSecondary/20 backdrop-blur-md font-black uppercase tracking-widest hover:border-textSecondary transition-all w-full sm:w-auto text-center hover:bg-bgSecondary/40 text-sm">
               Access Vault
@@ -143,10 +149,11 @@ const LandingPage = () => {
             </div>
           </div>
         </motion.div>
-      </div>
+        </div>
+      </section>
 
-      {/* Feature Section - Compact */}
-      <div className="bg-bgSecondary/30 backdrop-blur-md py-24 border-t border-border relative z-10 overflow-hidden">
+      {/* ── Section 2: Features ─────────────────────────────── */}
+      <section className="min-h-screen flex items-center justify-center bg-bgSecondary/30 backdrop-blur-md py-24 border-t border-border relative z-10 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[200px] bg-accentPrimary/10 blur-[120px] rounded-full pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -186,12 +193,16 @@ const LandingPage = () => {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       <style>{`
         @keyframes gradient {
           0% { background-position: 0% 50%; }
           100% { background-position: 200% 50%; }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>
