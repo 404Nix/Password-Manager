@@ -9,7 +9,6 @@ import bcrypt from "bcrypt";
 import { PasswordManager } from "../models/passwordManager.model.js";
 
 const isProduction = process.env.NODE_ENV === "production";
-console.log("Backend Environment - isProduction:", isProduction, "NODE_ENV:", process.env.NODE_ENV);
 
 const cookieOptions = {
     httpOnly: true,
@@ -20,7 +19,6 @@ const cookieOptions = {
     sameSite: isProduction ? "strict" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
-console.log("Cookie Options configured as:", cookieOptions);
 
 
 export const registerUser = async (req, res) => {
@@ -148,12 +146,9 @@ export const getMe = async (req, res) => {
 
 export const refreshToken = async (req, res) => {
     try {
-        console.log("Headers arriving:", req.headers);
-        console.log("Cookies arriving:", req.cookies);
         const refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
-            console.log("No refresh token found in cookies");
             return res.status(401).json({ message: "Unauthorized" });
         }
 
