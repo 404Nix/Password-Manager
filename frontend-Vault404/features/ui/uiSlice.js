@@ -36,6 +36,9 @@ const uiSlice = createSlice({
     toggleSidebar(state) {
       state.sidebarOpen = !state.sidebarOpen;
     },
+    closeSidebar(state) {
+      state.sidebarOpen = false;
+    },
     openModal(state, action) {
       const { modalName, data } = action.payload;
       state.modals[modalName] = data !== undefined ? data : true;
@@ -49,5 +52,5 @@ const uiSlice = createSlice({
   },
 });
 
-export const { toggleTheme, setTheme, toggleSidebar, openModal, closeModal, setGlobalLoading } = uiSlice.actions;
+export const { toggleTheme, setTheme, toggleSidebar, closeSidebar, openModal, closeModal, setGlobalLoading } = uiSlice.actions;
 export default uiSlice.reducer;

@@ -1,9 +1,11 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { motion } from 'framer-motion';
-import { LayoutDashboard, Lock, User, Settings, LogOut, Shield } from 'lucide-react';
+import { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LayoutDashboard, Lock, User, Settings, LogOut, Shield, X } from 'lucide-react';
 import { clsx } from 'clsx';
 import { logoutUser } from '../../features/auth/authSlice';
+import { toggleSidebar, closeSidebar } from '../../features/ui/uiSlice';
 import toast from 'react-hot-toast';
 
 const Sidebar = () => {
@@ -11,6 +13,14 @@ const Sidebar = () => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Close sidebar on mobile when navigating
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      dispatch(closeSidebar());
+    }
+  }, [location.pathname, dispatch]);
 
   const handleLogout = async () => {
     try {
@@ -18,7 +28,6 @@ const Sidebar = () => {
       toast.success('Logged out successfully');
       navigate('/login');
     } catch {
-      // clearAuth will handle the state
       navigate('/login');
     }
   };
@@ -31,17 +40,46 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className={clsx(
-      "glass border-r border-border flex flex-col transition-all duration-300",
-      sidebarOpen ? "w-64" : "w-0 md:w-20 overflow-hidden"
-    )}>
+    <>
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => dispatch(closeSidebar())}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      <div className={clsx(
+        "glass border-r border-border flex flex-col transition-all duration-300 z-50",
+        "fixed md:relative left-0 top-0 h-full md:h-auto w-64",
+        sidebarOpen 
+          ? "translate-x-0 pointer-events-auto" 
+          : "-translate-x-full md:translate-x-0 md:w-20 overflow-hidden pointer-events-none md:pointer-events-auto"
+      )}>
       {/* Brand */}
       <div className={clsx(
-        "h-20 flex items-center border-b border-border text-accentSecondary font-bold text-2xl tracking-wider transition-all duration-300",
+        "h-20 flex items-center justify-between border-b border-border text-accentSecondary font-bold text-2xl tracking-wider transition-all duration-300",
         sidebarOpen ? "px-6" : "justify-center px-0"
       )}>
-        <span>V<span className="text-accentPrimary">404</span></span>
-        {sidebarOpen && <span className="ml-2 text-textPrimary uppercase text-sm tracking-[0.2em] font-light">Vault</span>}
+        <div className="flex items-center">
+          <span>V<span className="text-accentPrimary">404</span></span>
+          {sidebarOpen && <span className="ml-2 text-textPrimary uppercase text-sm tracking-[0.2em] font-light">Vault</span>}
+        </div>
+        
+        {sidebarOpen && (
+          <motion.button
+            onClick={() => dispatch(closeSidebar())}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="md:hidden text-textSecondary hover:text-textPrimary transition-colors cursor-pointer"
+          >
+            <X className="w-6 h-6" />
+          </motion.button>
+        )}
       </div>
 
       {/* User Section */}
@@ -98,6 +136,7 @@ const Sidebar = () => {
         </motion.button>
       </div>
     </div>
+    </>
   );
 };
 

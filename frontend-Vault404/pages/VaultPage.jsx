@@ -16,6 +16,8 @@ import {
   User,
   Lock,
   KeyRound,
+  ShieldCheck,
+  ShieldAlert,
 } from 'lucide-react';
 import {
   fetchVaultItems,
@@ -226,12 +228,40 @@ const VaultPage = () => {
             </div>
           )}
         </div>
-        <div className="flex gap-4 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-4 w-full md:w-auto mt-4 md:mt-0">
+          <div className="flex items-center gap-1.5 p-1 bg-border/20 rounded-xl border border-border">
+            <button
+              onClick={() => setSearchParams({})}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                !filterParam ? 'bg-accentPrimary text-white shadow-sm' : 'text-textSecondary hover:text-textPrimary'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setSearchParams({ filter: 'strong' })}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                filterParam === 'strong' ? 'bg-success text-white shadow-sm' : 'text-textSecondary hover:text-success'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Strong</span>
+            </button>
+            <button
+              onClick={() => setSearchParams({ filter: 'weak' })}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                filterParam === 'weak' ? 'bg-danger text-white shadow-sm' : 'text-textSecondary hover:text-danger'
+              }`}
+            >
+              <ShieldAlert className="w-3.5 h-3.5" />
+              <span>Weak</span>
+            </button>
+          </div>
           <div className="relative flex-1 md:w-64">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-textSecondary" />
             <input
               type="text"
-              placeholder="Filter..."
+              placeholder="Search vault..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-bgSecondary border border-border rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-accentPrimary transition-all duration-300"
